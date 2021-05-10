@@ -1,0 +1,14 @@
+#app {
+  height: 400px;
+  width: 240px;
+}
+.wrap {
+  height: 100%;
+  width: 100%;
+  background: whitesmoke;
+  overflow: hidden;
+}
+p {
+  font-size: 12px;
+  margin: 12px 8px;
+}

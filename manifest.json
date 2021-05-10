@@ -1,0 +1,20 @@
+{
+  "name": "video-downloader-for-tencent",
+  "description": "An Extension to download tencent video",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "browser_action": {
+    "default_icon": "img/icon.png",
+    "default_title": "Video Downloader For Tencent",
+    "default_popup": "popup/index.html"
+  },
+  "background": {
+    "scripts": ["scripts/background.js"]
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "webRequest"
+  ]
+}
