@@ -1,14 +1,146 @@
 #app {
-  height: 400px;
-  width: 240px;
+  height: 360px;
+  width: 220px;
+  font-size: 12px;
 }
-.wrap {
+main {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
   height: 100%;
   width: 100%;
-  background: whitesmoke;
+  background: white;
   overflow: hidden;
 }
-p {
-  font-size: 12px;
+
+header {
   margin: 12px 8px;
+  font-weight: bold;
+}
+
+section {
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+  border-top: 1px solid rgba(0, 0, 0, .06);
+  border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+footer {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  flex: none;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+button {
+  width: 94px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all .2s cubic-bezier(.35,0,.25,1);
+}
+
+button.outline {
+  border: 1px solid black;
+  background: white;
+}
+
+button.outline:hover {
+  background: rgba(0,0,0,.12);
+}
+
+button.outline:active {
+  background: rgba(0,0,0,.2);
+}
+
+button.primary {
+  border: 1px solid #1673ff;
+  background: #1673ff;
+  color: white;
+}
+
+button.primary:hover {
+  background: #4089f8;
+  border-color: #4089f8;
+}
+
+button.primary:active {
+  background: #1673ff;
+  border-color: #1673ff;
+}
+
+button.primary.disabled {
+  cursor: not-allowed;
+  background: #09121e;
+  border-color: #09121e;
+}
+
+.quality {
+  box-sizing: border-box;
+  padding: 12px 12px 20px;
+}
+
+.download {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(0, 0, 0, .06);
+  border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+.rate {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px 12px 20px;
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+  background: #e7f1fb;
+  border-radius: 2px;
+}
+
+.progress {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: #cdc7fc;
+}
+
+select {
+  width: 100%;
+  padding: 6px 4px;
+  outline: none;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.title {
+  margin: 8px 0 6px;
+  font-weight: normal;
+}
+
+.panel b {
+  position: relative;
+  z-index: 2;
+  font-size: 32px;
+  margin-bottom: 12px;
 }

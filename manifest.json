@@ -9,12 +9,13 @@
     "default_title": "Video Downloader For Tencent",
     "default_popup": "popup/index.html"
   },
-  "background": {
-    "scripts": ["scripts/background.js"]
-  },
+  "devtools_page": "devtools/index.html",
   "permissions": [
+    "tabs",
     "storage",
     "activeTab",
-    "webRequest"
+    "<all_urls>",
+    "webRequest",
+    "webRequestBlocking"
   ]
 }

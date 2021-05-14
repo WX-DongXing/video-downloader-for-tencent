@@ -1,0 +1,17 @@
+{
+  "name": "video-downloader-for-tencent",
+  "version": "0.0.1",
+  "description": "An Extension to download tencent video",
+  "main": "index.js",
+  "repository": "https://github.com/WX-DongXing/video-downloader-for-tencent.git",
+  "author": "WX-DongXing <xingdong.com@live.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.26.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-vue": "^7.9.0"
+  }
+}
