@@ -36,23 +36,43 @@ const app = createApp({
       </main>
     `,
   setup () {
-    const { chrome } = window
+    const { chrome, m3u8Parser } = window
 
     const state = reactive({
       tabId: null,
       quality: null,
       allowDownload: false,
       options: [{ label: '默认', value: 0 }],
-      fragmentSize: 0,
-      downloadSize: 0
+      playlists: [],
+      manifest: {},
+      segments: [],
+      buffers: []
     })
 
     const rate = computed(() => {
-      return (state.downloadSize / state.fragmentSize) ? (state.downloadSize / state.fragmentSize).toFixed(2) : 0 + '%'
+      const value = (state.buffers.length / state.segments.length * 100)
+      return `${value ? value.toFixed() : 0}%`
+    })
+
+    const request = (url, option) => new Promise((resolve, reject) => {
+      const { type = 'text', ...prop } = { ...option }
+      fetch(new Request(url))
+        .then(response => response.blob())
+        .then(blob => type === 'text' ? blob.text() : blob.arrayBuffer())
+        .then(data => resolve({ data, ...prop }))
+        .catch(reject)
     })
 
     const handleReload = () => {
       state.tabId && chrome.tabs.reload(state.tabId)
+      Object.assign(state, {
+        allowDownload: false,
+        options: [{ label: '默认', value: 0 }],
+        playlists: [],
+        manifest: {},
+        segments: [],
+        buffers: []
+      })
     }
 
     onMounted(async () => {
@@ -61,12 +81,30 @@ const app = createApp({
         state.tabId = tab.id
         await chrome.tabs.reload(tab.id)
 
-        chrome.webRequest.onBeforeRequest.addListener(({ method, url }) => {
+        chrome.webRequest.onBeforeRequest.addListener(async ({ method, url }) => {
           if (method === 'GET' && /.m3u8/.test(url)) {
             const [data] = url.match(/(?<=data=)(\S*?)(?=&)/g) || []
             if (!data) return false
             const { url: m3u8FilePath } = JSON.parse(decodeURIComponent(data)) || {}
             if (!m3u8FilePath) return false
+
+            const result = await request('http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8', { index: 1 })
+            const parser = new m3u8Parser.Parser()
+            parser.push(result.data)
+            parser.end()
+
+            const { playlists, manifest } = parser
+
+            state.playlists = playlists || []
+            state.manifest = manifest || {}
+
+            if (playlists.length) {
+              // state.options =
+            } else {
+              state.segments = manifest.segments
+            }
+
+            console.log(parser)
           }
         }, { urls: ['*://btrace.video.qq.com/kvcollect*'] }, ['extraHeaders'])
       })
