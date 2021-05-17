@@ -5,6 +5,5 @@ document.documentElement.appendChild(interceptor)
 
 // send response
 window.addEventListener('xhr', (event) => {
-  console.log(event.response)
-  chrome.runtime.sendMessage({ type: 'xhr', ...event.response })
+  chrome.runtime.sendMessage({ type: 'xhr', ...event.detail })
 }, false)

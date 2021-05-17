@@ -76,8 +76,11 @@ const app = createApp({
     }
 
     onMounted(async () => {
-      chrome.runtime.onMessage.addListener(event => {
-        console.log('XHR: ', event)
+      chrome.runtime.onMessage.addListener(({ response }) => {
+        const { vinfo } = JSON.parse(response)
+        if (!vinfo) return
+        const info = JSON.parse(vinfo)
+        console.log('xhr: ', info)
       })
 
       chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
