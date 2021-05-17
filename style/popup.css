@@ -1,6 +1,6 @@
 #app {
   height: 360px;
-  width: 220px;
+  width: 240px;
   font-size: 12px;
 }
 main {
@@ -38,7 +38,7 @@ footer {
 }
 
 button {
-  width: 94px;
+  width: 105px;
   padding: 8px;
   cursor: pointer;
   border-radius: 2px;

@@ -15,5 +15,6 @@ module.exports = {
     'vue'
   ],
   rules: {
+    'node/no-callback-literal': 'off'
   }
 }

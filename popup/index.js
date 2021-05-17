@@ -19,7 +19,7 @@ const app = createApp({
 
             <div class="download">
                 <span>下载</span>
-                <span>{{ downloadSize }} / {{ fragmentSize }}</span>
+                <span>{{ buffers.length }} / {{ segments.length }}</span>
             </div>
 
             <div class="rate">
@@ -76,37 +76,41 @@ const app = createApp({
     }
 
     onMounted(async () => {
+      chrome.runtime.onMessage.addListener(event => {
+        console.log('XHR: ', event)
+      })
+
       chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
         // 刷新当前窗口，以便进行接口拦截
         state.tabId = tab.id
         await chrome.tabs.reload(tab.id)
 
-        chrome.webRequest.onBeforeRequest.addListener(async ({ method, url }) => {
-          if (method === 'GET' && /.m3u8/.test(url)) {
-            const [data] = url.match(/(?<=data=)(\S*?)(?=&)/g) || []
-            if (!data) return false
-            const { url: m3u8FilePath } = JSON.parse(decodeURIComponent(data)) || {}
-            if (!m3u8FilePath) return false
-
-            const result = await request('http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8', { index: 1 })
-            const parser = new m3u8Parser.Parser()
-            parser.push(result.data)
-            parser.end()
-
-            const { playlists, manifest } = parser
-
-            state.playlists = playlists || []
-            state.manifest = manifest || {}
-
-            if (playlists.length) {
-              // state.options =
-            } else {
-              state.segments = manifest.segments
-            }
-
-            console.log(parser)
-          }
-        }, { urls: ['*://btrace.video.qq.com/kvcollect*'] }, ['extraHeaders'])
+        // chrome.webRequest.onBeforeRequest.addListener(async ({ method, url }) => {
+        //   if (method === 'GET' && /.m3u8/.test(url)) {
+        //     const [data] = url.match(/(?<=data=)(\S*?)(?=&)/g) || []
+        //     if (!data) return false
+        //     const { url: m3u8FilePath } = JSON.parse(decodeURIComponent(data)) || {}
+        //     if (!m3u8FilePath) return false
+        //
+        //     const result = await request('http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8', { index: 1 })
+        //     const parser = new m3u8Parser.Parser()
+        //     parser.push(result.data)
+        //     parser.end()
+        //
+        //     const { playlists, manifest } = parser
+        //
+        //     state.playlists = playlists || []
+        //     state.manifest = manifest || {}
+        //
+        //     if (playlists.length) {
+        //       // state.options =
+        //     } else {
+        //       state.segments = manifest.segments
+        //     }
+        //
+        //     console.log(parser)
+        //   }
+        // }, { urls: ['*://btrace.video.qq.com/kvcollect*'] }, ['extraHeaders'])
       })
     })
 
