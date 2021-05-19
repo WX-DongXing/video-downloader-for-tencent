@@ -5,11 +5,10 @@ const hook = (callback, { filter }) => {
 
   XMLHttpRequest.prototype.open = function () {
     this.addEventListener('load', function () {
-      const { response, responseText, responseURL, status } = this
+      const { response, responseURL, status } = this
       if (status === 200 && pattern.test(responseURL)) {
-        console.log(responseURL)
         callback && callback({
-          response: response || responseText,
+          response,
           url: responseURL
         })
       }

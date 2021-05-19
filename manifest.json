@@ -7,9 +7,10 @@
     "tabs",
     "storage",
     "activeTab",
-    "<all_urls>",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "<all_urls>",
+    "https://unpkg.com/"
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "browser_action": {
@@ -28,6 +29,7 @@
   ],
   "web_accessible_resources": [
     "scripts/injection.js",
-    "scripts/interceptor.js"
+    "scripts/interceptor.js",
+    "scripts/ffmpeg.min.js"
   ]
 }
