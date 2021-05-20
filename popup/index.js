@@ -5,6 +5,11 @@ const app = createApp({
       <main>
         <header>HLS Downloader</header>
         <section>
+            <div class="info">
+                <p class="title">名称</p>
+                <p>{{ title }}</p>
+            </div>
+
             <div class="quality">
                 <p class="title">质量</p>
                 <select ref="select" @change="handleSwitchQuality">
@@ -18,7 +23,7 @@ const app = createApp({
             </div>
 
             <div class="download">
-                <span>下载</span>
+                <span><b>下载</b></span>
                 <span>{{ size }} / {{ segments.length }}</span>
             </div>
 
@@ -164,27 +169,29 @@ const app = createApp({
           const { fetchSegments, abort } = createFetchSegments(paths)
           state.abort = abort
           const segments = await fetchSegments()
-          const sortBuffers = segments
+
+          const { uintArrays, length } = segments
             .sort((a, b) => a.index - b.index)
-            .map(segment => new ArrayBuffer(segment.data))
+            .reduce((acc, cur) => {
+              const uintArray = new Uint8Array(cur.data)
+              acc.length += uintArray.length
+              acc.uintArrays.push(uintArray)
+              return acc
+            }, { uintArrays: [], length: 0 })
 
           // merge buffers
-          const bufferLength = sortBuffers.reduce((acc, cur) => {
-            acc += cur.length
-            return acc
-          }, 0)
-          const { buffers } = sortBuffers.reduce((acc, cur) => {
+          const { buffers } = uintArrays.reduce((acc, cur) => {
             acc.buffers.set(cur, acc.length)
             acc.length += cur.length
             return acc
-          }, { buffers: new Uint8Array(bufferLength), length: 0 })
+          }, { buffers: new Uint8Array(length), length: 0 })
 
           // Decode
           const ffmpeg = createFFmpeg({ log: true })
           await ffmpeg.load()
-          ffmpeg.FS('writeFile', `${state.title}.ts`, buffers)
-          await ffmpeg.run('-i', `${state.title}.ts`, `${state.title}.mp4`)
-          const data = ffmpeg.FS('readFile', `${state.title}.mp4`)
+          ffmpeg.FS('writeFile', 'source.ts', buffers)
+          await ffmpeg.run('-i', 'source.ts', 'output.mp4')
+          const data = ffmpeg.FS('readFile', 'output.mp4')
 
           // Download
           const blob = new Blob([data.buffer])
@@ -232,13 +239,13 @@ const app = createApp({
     onMounted(async () => {
       chrome.runtime.onMessage.addListener(({ response }) => {
         const { vinfo } = JSON.parse(response)
-        if (!vinfo) return
         console.log(JSON.parse(vinfo))
-        const { fl: { fi }, vl: { vi, ti } } = JSON.parse(vinfo)
+        if (!vinfo) return
+        const { fl: { fi }, vl: { vi } } = JSON.parse(vinfo)
         if (!state.playlists.length) {
           state.options = fi
-          state.title = ti
           state.playlists = vi[0]?.ul?.ui
+          state.title = vi[0]?.ti
           state.fileUrl = [...state.playlists].pop().url
           handleParseM3u8()
         }

@@ -1,6 +1,6 @@
 #app {
-  height: 360px;
-  width: 240px;
+  height: 420px;
+  width: 280px;
   font-size: 12px;
 }
 main {
@@ -38,7 +38,7 @@ footer {
 }
 
 button {
-  width: 105px;
+  width: 125px;
   padding: 8px;
   cursor: pointer;
   border-radius: 2px;
@@ -80,9 +80,22 @@ button.primary.disabled {
   border-color: #09121e;
 }
 
+.info {
+  box-sizing: border-box;
+  padding: 12px 12px 0;
+}
+
 .quality {
   box-sizing: border-box;
-  padding: 12px 12px 20px;
+  padding: 0 12px 20px;
+}
+
+.info p {
+  width: 256px;
+  height: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .download {
@@ -91,7 +104,7 @@ button.primary.disabled {
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  padding: 12px 18px;
+  padding: 12px;
   border-top: 1px solid rgba(0, 0, 0, .06);
   border-bottom: 1px solid rgba(0, 0, 0, .06);
 }
@@ -134,8 +147,8 @@ select {
 }
 
 .title {
-  margin: 8px 0 6px;
-  font-weight: normal;
+  margin: 8px 0 12px;
+  font-weight: bold;
 }
 
 .panel b {
