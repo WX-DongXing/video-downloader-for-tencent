@@ -3,10 +3,10 @@ const app = createApp({
   name: 'Popup',
   template: `
       <main>
-        <header>HLS Downloader</header>
+        <header>HLS Downloader For Tencent</header>
         <section>
             <div class="info">
-                <p class="title">名称</p>
+                <p class="title">标题</p>
                 <p>{{ title }}</p>
             </div>
 
@@ -229,7 +229,6 @@ const app = createApp({
     }
 
     const handleParseM3u8 = async () => {
-      console.log(state.fileUrl)
       const baseUrl = state.fileUrl.replace(/(\S+\/)\S+/, '$1')
       const { request } = createRequest(state.fileUrl)
       const result = await request()
@@ -243,7 +242,6 @@ const app = createApp({
       })
     }
 
-
     const handleReload = () => {
       state.abort && state.abort()
       state.tabId && chrome.tabs.reload(state.tabId)
@@ -253,7 +251,6 @@ const app = createApp({
     onMounted(async () => {
       chrome.runtime.onMessage.addListener(({ response }) => {
         const { vinfo } = JSON.parse(response)
-        console.log(JSON.parse(vinfo))
         if (!vinfo) return
         const { vl: { vi } } = JSON.parse(vinfo)
         if (!state.playlists.length) {
