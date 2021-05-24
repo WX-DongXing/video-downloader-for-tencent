@@ -11,13 +11,13 @@ const app = createApp({
             </div>
 
             <div class="quality">
-                <p class="title">质量</p>
-                <select ref="select" @change="handleSwitchQuality">
+                <p class="title">转码</p>
+                <select ref="select" v-model="enableTranscoding">
                         <option
                            v-for="option in options"
-                           :value="option.id"
-                           :key="option.id">
-                           {{ option.sname }}
+                           :value="option.value"
+                           :key="option.label">
+                           {{ option.label }}
                          </option>
                     </select>
             </div>
@@ -33,7 +33,7 @@ const app = createApp({
                     <div class="progress" :style="{ width: rate }"></div>
                 </div>
                 <div class="panel" v-else>
-                    <b>正在转码</b>
+                    <b>正在转码 {{ transcodingRatio }}%</b>
                 </div>
             </div>
         </section>
@@ -53,13 +53,18 @@ const app = createApp({
       fileUrl: null,
       allowDownload: true,
       title: '',
-      options: [{ sname: '默认', id: 0 }],
+      options: [
+        { label: '转码', value: true },
+        { label: '不转码', value: false }
+      ],
       playlists: [],
       manifest: {},
       segments: [],
       buffers: [],
       size: 0,
-      abort: null
+      abort: null,
+      enableTranscoding: true,
+      transcodingRatio: 0
     })
 
     const rate = computed(() => {
@@ -87,7 +92,8 @@ const app = createApp({
         segments: [],
         buffers: [],
         size: 0,
-        abort: null
+        abort: null,
+        transcodingRatio: 0
       })
     }
 
@@ -186,20 +192,34 @@ const app = createApp({
             return acc
           }, { buffers: new Uint8Array(length), length: 0 })
 
-          // Decode
-          const ffmpeg = createFFmpeg({ log: true })
-          await ffmpeg.load()
-          ffmpeg.FS('writeFile', 'source.ts', buffers)
-          await ffmpeg.run('-i', 'source.ts', 'output.mp4')
-          const data = ffmpeg.FS('readFile', 'output.mp4')
+          let data = buffers
+
+          if (state.enableTranscoding) {
+            // Decode
+            const ffmpeg = createFFmpeg({ log: true })
+            await ffmpeg.load()
+            ffmpeg.FS('writeFile', 'source.ts', buffers)
+            ffmpeg.setProgress(({ ratio }) => {
+              state.transcodingRatio = ratio > 0 ? Math.round(+ratio * 100) : 0
+            })
+            await ffmpeg.run('-i', 'source.ts', 'output.mp4')
+            data = ffmpeg.FS('readFile', 'output.mp4')
+
+            setTimeout(() => {
+              // 清除ffmpeg中的文件数据
+              ffmpeg.FS('unlink', 'source.ts')
+              ffmpeg.FS('unlink', 'output.mp4')
+            }, 1000)
+          }
 
           // Download
           const blob = new Blob([data.buffer])
           const link = document.createElement('a')
           link.href = window.URL.createObjectURL(blob)
-          link.setAttribute('download', `${state.title}.mp4`)
+          link.setAttribute('download', `${state.title}.${state.enableTranscoding ? 'mp4' : 'ts'}`)
           link.click()
           window.URL.revokeObjectURL(link.href)
+
           reset()
         }
       } catch (e) {
@@ -223,12 +243,6 @@ const app = createApp({
       })
     }
 
-    const handleSwitchQuality = async ({ target: { value } }) => {
-      state.abort && state.abort()
-      const index = state.options.findIndex(option => +option.id === +value)
-      state.fileUrl = state.playlists[index].url
-      await handleParseM3u8()
-    }
 
     const handleReload = () => {
       state.abort && state.abort()
@@ -241,9 +255,8 @@ const app = createApp({
         const { vinfo } = JSON.parse(response)
         console.log(JSON.parse(vinfo))
         if (!vinfo) return
-        const { fl: { fi }, vl: { vi } } = JSON.parse(vinfo)
+        const { vl: { vi } } = JSON.parse(vinfo)
         if (!state.playlists.length) {
-          state.options = fi
           state.playlists = vi[0]?.ul?.ui
           state.title = vi[0]?.ti
           state.fileUrl = [...state.playlists].pop().url
@@ -263,7 +276,6 @@ const app = createApp({
       status,
       ...toRefs(state),
       handleReload,
-      handleSwitchQuality,
       handleDownload
     }
   }
